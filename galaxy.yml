@@ -1,0 +1,36 @@
+---
+- hosts: galaxyservers
+  become: true
+  pre_tasks:
+    - name: Install Dependencies
+      package:
+        name: ['acl', 'bzip2', 'git', 'make', 'python3-psycopg2', 'tar', 'virtualenv']
+    - git:
+        repo: 'https://github.com/usegalaxy-eu/libraries-training-repo'
+        dest: /libraries/
+  handlers:
+    - name: "Restart Galaxy"
+      systemd:
+        name: galaxy
+        state: restarted
+  roles:
+    - galaxyproject.repos
+    - galaxyproject.slurm
+    - galaxyproject.postgresql
+    - role: natefoo.postgresql_objects
+      become: true
+      become_user: postgres
+    - geerlingguy.pip
+    - gantsign.golang
+    - cyverse-ansible.singularity
+    - galaxyproject.galaxy
+    - role: uchida.miniconda
+      become: true
+      become_user: "{{ galaxy_user.name }}"
+    - usegalaxy_eu.galaxy_systemd
+    - galaxyproject.nginx
+    - galaxyproject.cvmfs
+  post_tasks:
+   - name: Install slurm-drmaa
+     package:
+       name: slurm-drmaa1
