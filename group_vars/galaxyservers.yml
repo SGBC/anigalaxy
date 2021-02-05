@@ -98,12 +98,13 @@ certbot_share_key_users:
 certbot_post_renewal: |
     systemctl restart nginx || true
 certbot_domains:
- - "{{ inventory_hostname }}"
+  - "{{ inventory_hostname }}"
 certbot_agree_tos: --agree-tos
 
 # NGINX
 nginx_selinux_allow_local_connections: true
 nginx_servers:
+  - galaxy
 nginx_enable_default_server: false
 nginx_conf_http:
   client_max_body_size: 1g
